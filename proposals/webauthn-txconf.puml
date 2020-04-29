@@ -1,0 +1,113 @@
+@startuml
+
+box "User Device"
+  actor Alice
+  participant "WebAuthn Client Platform" as FidoClient
+  participant "Payment Handler\n(mybank.com)" as Handler
+  participant "Browser" as Browser
+  participant "Merchant Website\n(merchant.com)" as Website
+end box
+box "Bank, Wallet, etc"
+  participant "FIDO Server" as FidoServer
+end box
+
+autonumber 1
+    note over Website
+      let total = {
+        label: "Total", 
+        amount: { 
+          currency: "USD", 
+          amount: "100.00"
+        }
+      }
+
+      let pr = new PaymentRequest(
+        [{ supported_methods: 
+            "http://paymentnetwork.org" }],
+        { total }
+      )
+    end note
+    Alice -> Website: <Click Pay>
+    note over Website
+      let cmp = await pr.canMakePayment()
+    end note
+    Website -> Browser: pr.canMakePayment()
+    Browser --> Website:
+    note over Website
+      assert(cmp.canGetPublicKeyCredential)
+      let response = await pr.show()
+    end note
+    Website -> Browser: pr.show()
+    activate Browser
+    Browser -> Alice: Select payment handler?
+    Alice --> Browser: <Select MyBank (mybank.com)>
+    Browser -> Handler: <emit PaymentRequestEvent>
+    activate Handler
+    note over Handler
+      let e = <PaymentRequestEvent>
+      **NOTE:** e.openWindow() throws InvalidStateError
+
+      let username = localStorage.getItem("username")
+      let options = getServerPublicKeyCredentialOptions(username)
+    end note
+    Handler -> FidoServer: getServerPublicKeyCredentialOptions(username)
+    note over Handler
+      **NOTE:** options == {
+        "challenge": "6283u0svT-YIF3pSolzkQHStwkJCaLKx",
+        "timeout": 20000,
+        "rpId": "https://mybank.com",
+        "allowCredentials": [
+            {
+                "id": "m7xl_TkTcCe0WcXI2M-4ro9vJAuwcj4m",
+                "type": "public-key"
+            }
+        ],
+        "userVerification": "required"
+      }
+
+      let credential = e.getCredential(options)
+    end note
+    Handler -> Browser: e.getCredential()
+    note over Browser
+      let clientData = {
+        type: "webauthn.get",
+        challenge: "6283u0svT-YIF3pSolzkQHStwkJCaLKx",
+        origin: "mybank.com",
+        transaction: {
+          amount: {
+            currency: "USD",
+            value: "10000"
+          },
+          payee: "https://merchant.com"
+        }
+      }
+      let hash = Hash(clientData)
+      let rpId = "http://mybank.com"
+      let requireUserVerification = true
+      let extensions = {
+        txAuthSimple: "A payment of $10 to merchant.com"
+      }
+      return assertion = await authenticatorGetAssertion(
+          rpId, hash, requireUserVerification, extensions)
+    end note
+    Browser -> FidoClient: authenticatorGetAssertion()
+    activate FidoClient
+    FidoClient -> Alice: Please scan fingerprint \nto authorize: A payment \nof $10 to merchant.com?
+    Alice --> FidoClient: <Scan Fingerprint>
+    FidoClient --> Browser:
+    deactivate FidoClient
+    Browser --> Handler
+    note over Handler
+      e.respondWith(credential)
+    end note
+    Handler --> Browser: e.respondWith()
+    deactivate Handler
+    Browser --> Website: 
+    deactivate Browser
+    note over Website
+      **NOTE:** Response is a WebAuthn assertion
+      signed by mybank.com and including an
+      assertion that Alice was shown the tx
+      details before authorizing
+    end note
+@enduml
