@@ -175,7 +175,11 @@ When a credential is stored by the RP it could tag it as usable for payments abd
 
 This proposal requires updates to client platforms to support Transaction Confirmation however the extent to which this is true and where the changes are required is unclear.
 
-References:
+## References
 
 FIDO Server interaction examples from
 [FIDO Alliance - Server Requirements and Transport Binding Profile](https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-server-v2.0-rd-20180702.html#authentication-example-credential-get-options)
+
+## Acknowledgements
+
+Thanks to Dirk Balfanz, Danyao Wang, Rouslan Solomakhin, Matt de Haast, Jeff Hodges, John Bradley, John Fontana, Ian Jacobs, Cairin Michie, Marcos Caceres, Benjamin Tidor and many others for help and feedback on this so far.
