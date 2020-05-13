@@ -17,11 +17,10 @@ is always a generic authentication UI such as the example below.
 
 In the absence of TxConf an authenticator can ONLY assert that the challenge
 provided by the RP was signed inside the authenticator at the consent of the
-user (who provided the neccessary gesture to "unlock" the authenticator, e.g.
+user (who provided the necessary gesture to "unlock" the authenticator, e.g.
 biometric scan, PIN etc).
 
-The RP has **no guarantees** about what the user was prompted when they signed
-the challenge.
+The RP has **no guarantees** about what the user viewed when challenged.
 
 This is fine if simply **authenticating** the user is the requirement (e.g. for
 login). However, when requesting that a user consent to, and authorize, a
@@ -69,7 +68,7 @@ leverage:
 - The fact that the transaction data that is held by the PaymentRequest object
   is well structured
 - The fact that we can invoke APIs from within a Payment Handler's
-  PaymentRequestEvent event hander and have the current PaymentRequest object in
+  PaymentRequestEvent event handier and have the current PaymentRequest object in
   context
 - The fact that the platform (not the browser or website) renders the UI that is
   shown to the user when getting an attestation
@@ -110,7 +109,7 @@ as long as they can produce the assertion required.
    not able to show it's own UI too.
 
    The payment handler gets the current user's username from local storage (or
-   maybe from the Credential Management API) 9.The payment handler calls out to
+   maybe from the Credential Management API). The payment handler calls out to
    its FIDO server to get a challenge. (_This could be expanded to include the
    details of the transaction so that these are also included in the
    challenge._)
@@ -169,7 +168,7 @@ There are a number of benefits to this approach, and changes in the ecosystem th
 
 Perhaps there is a way to simply hook into `navigator.credentials.store()` so that RPs don't need to provide a payment handler at all?
 
-When a credential is stored by the RP it could tag it as usable for payments abd specify the payment methods that it supports. The browser would record this and the RP would be available as an option when PR API is invoked and the merchant is requesting this flow.
+When a credential is stored by the RP it could tag it as usable for payments and specify the payment methods that it supports. The browser would record this and the RP would be available as an option when PR API is invoked and the merchant is requesting this flow.
 
 ## Challenges
 
@@ -180,6 +179,6 @@ This proposal requires updates to client platforms to support Transaction Confir
 FIDO Server interaction examples from
 [FIDO Alliance - Server Requirements and Transport Binding Profile](https://fidoalliance.org/specs/fido-v2.0-rd-20180702/fido-server-v2.0-rd-20180702.html#authentication-example-credential-get-options)
 
-## Acknowledgements
+## Acknowledgments
 
 Thanks to Dirk Balfanz, Danyao Wang, Rouslan Solomakhin, Matt de Haast, Jeff Hodges, John Bradley, John Fontana, Ian Jacobs, Cairin Michie, Marcos Caceres, Benjamin Tidor and many others for help and feedback on this so far.
