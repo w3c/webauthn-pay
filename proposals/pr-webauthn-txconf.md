@@ -1,4 +1,5 @@
 # WebAuthN + Payment Request = Payment AuthZ
+# aka "WebAuthn to Pay Proposal"
 
 Can we use a combination of Payment Request API and WebAuthN internals and UI to
 get Transaction Confirmation (Dynamic Linking)?
